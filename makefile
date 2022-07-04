@@ -1,3 +1,4 @@
+.PHONY: build-wasm
 build-wasm:
 	RUSTC_WRAPPER="" \
 	\
@@ -8,6 +9,13 @@ build-wasm:
 	STRIP_wasm32_unknown_unknown=${LLVM_PATH:?}/bin/llvm-strip \
 	\
 	wasm-pack build \
-		--out-dir "${output_path:?}" \
+		--out-dir pkg \
 		--target web \
 		--release
+
+.PHONY: copy-helper
+	cp -rf helper/EncoderDecoderTogether.min.js pkg
+
+.PHONY: build-wx-wasm copy-helper
+build-wx-wasm: build-wasm
+	patch -p0 pkg/rsa2_sign.js helper/wx.patch

@@ -1,0 +1,55 @@
+1a2,7
+> require('./EncoderDecoderTogether.min.js')
+> const TextDecoder = global.TextDecoder;
+> const TextEncoder = global.TextEncoder;
+> 
+> const WebAssembly = WXWebAssembly;
+> 
+8d13
+< let cachedUint8Memory0;
+10,13c15
+<     if (cachedUint8Memory0.byteLength === 0) {
+<         cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
+<     }
+<     return cachedUint8Memory0;
+---
+>     return new Uint8Array(wasm.memory.buffer);
+17c19
+<     return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
+---
+>     return String.fromCharCode.apply(null, getUint8Memory0().subarray(ptr, ptr + len))
+75d76
+< let cachedInt32Memory0;
+77,80c78
+<     if (cachedInt32Memory0.byteLength === 0) {
+<         cachedInt32Memory0 = new Int32Array(wasm.memory.buffer);
+<     }
+<     return cachedInt32Memory0;
+---
+>     return new Int32Array(wasm.memory.buffer);
+123,128c121
+<         if (instance instanceof WebAssembly.Instance) {
+<             return { instance, module };
+< 
+<         } else {
+<             return instance;
+<         }
+---
+>         return instance;
+149,151d141
+<     cachedInt32Memory0 = new Int32Array(wasm.memory.buffer);
+<     cachedUint8Memory0 = new Uint8Array(wasm.memory.buffer);
+< 
+168,170d157
+<     if (typeof input === 'undefined') {
+<         input = new URL('rsa2_sign_bg.wasm', import.meta.url);
+<     }
+173,176d159
+<     if (typeof input === 'string' || (typeof Request === 'function' && input instanceof Request) || (typeof URL === 'function' && input instanceof URL)) {
+<         input = fetch(input);
+<     }
+< 
+179c162
+<     const { instance, module } = await load(await input, imports);
+---
+>     const { instance, module } = await load(input, imports);
