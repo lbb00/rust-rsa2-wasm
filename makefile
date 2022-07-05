@@ -12,6 +12,7 @@ build-wasm:
 		--out-dir pkg \
 		--target web \
 		--release
+
 .PHONY: brotli-wasm
 brotli-wasm:
 	brotli -f pkg/rsa2_sign_bg.wasm
@@ -19,7 +20,7 @@ brotli-wasm:
 .PHONY: copy-helper
 	cp -rf helper/EncoderDecoderTogether.min.js pkg
 
-.PHONY: build-wx-wasm copy-helper
+.PHONY: build-wx-wasm copy-helper brotli-wasm
 build-wx-wasm: build-wasm
 	patch -p0 pkg/rsa2_sign.js helper/wx.patch
 
