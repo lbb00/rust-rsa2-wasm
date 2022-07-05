@@ -18,7 +18,8 @@ brotli-wasm:
 	brotli -f pkg/rsa2_sign_bg.wasm
 
 .PHONY: copy-helper
-	cp -rf helper/EncoderDecoderTogether.min.js pkg
+copy-helper:
+	cp -rf helper/EncoderDecoderTogether.min.js pkg/
 
 .PHONY: build-wx-wasm copy-helper brotli-wasm
 build-wx-wasm: build-wasm

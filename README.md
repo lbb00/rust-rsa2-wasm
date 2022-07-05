@@ -2,7 +2,7 @@
 
 ## Usage
 
-### install
+### Install
 
 ```bash
 brew install brotli
@@ -14,6 +14,18 @@ export LLVM_PATH="your llvm path, like /usr/local/opt/llvm"
 
 ```bash
 make build-wx-wasm
+```
+
+### Example with Wechat Mini-Program
+
+- 将 pkg 下的 `rsa2_sign.js`、`EncoderDecoderTogether.min.js` 复制到小程序项目中的**同一目录下**.
+- 将 pkg 下的 `rsa2_sign_bg.wasm` 或 `rsa2_sign_bg.wasm.br` 复制到小程序项目中。
+
+```javascript
+import init, { rsa2_sign } from './rsa2_sign.js'
+
+await init('wasm文件相对小程序项目的位置，如/utils/rsa2_sign_bg.wasm.br')
+const res = rsa2_sign('okok')
 ```
 
 ## Refs
