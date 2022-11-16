@@ -21,7 +21,11 @@ brotli-wasm:
 copy-helper:
 	cp -rf helper/EncoderDecoderTogether.min.js pkg/
 
-.PHONY: build-wx-wasm copy-helper brotli-wasm
-build-wx-wasm: build-wasm
-	patch -p0 pkg/rsa2_sign.js helper/wx.patch
+.PHONY: delete-dist
+delete-dist:
+	rm -rf pkg
 
+.PHONY: build-wx-wasm
+build-wx-wasm: delete-dist build-wasm copy-helper brotli-wasm
+	cp pkg/rsa2_sign.js pkg/rsa2_sign.wx.js && \
+	patch -p0 pkg/rsa2_sign.wx.js helper/wx.patch
