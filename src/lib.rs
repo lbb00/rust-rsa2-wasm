@@ -1,15 +1,14 @@
-extern crate wasm_bindgen;
 extern crate pem;
+extern crate wasm_bindgen;
 
 use base64::encode;
+use once_cell::sync::OnceCell;
 use pem::parse;
 use ring::rand;
 use ring::signature;
 use wasm_bindgen::prelude::*;
 
-#[wasm_bindgen]
-pub fn rsa2_sign(message: &str) -> String {
-    const PRIVATE_KEY: &'static str = "-----BEGIN RSA PRIVATE KEY-----
+const PRIVATE_KEY: &'static str = "-----BEGIN RSA PRIVATE KEY-----
 MIIEogIBAAKCAQEAwkQQSRoP42Mrc9mP1tg7j2sKhtXAlyMWnTD8uX39y0dnS62U
 PzI99JJcVmlzjQqt8ZyLhNXiOECVGa9TLngRgWwQ08JOiIWfqDGgV95GwB14au8J
 eoU3ekWoBeX6MaeIWTgVL8lmAzSLnf46sbIATSievM3jGvqtRF++2k3mvUiU8RIi
@@ -37,20 +36,42 @@ OXPNfdNso4SxJHAnlLqcPyf5lWdsuNe1SUFT7wDYdUuUAwk5y80f41VOA79J8YLr
 arv0Mgxaip1YuKrWTS7YkcxVn3JHE99Adst1T3MvHkSM7qnpk3Q=
 -----END RSA PRIVATE KEY-----
 ";
-    let pem = parse(PRIVATE_KEY).unwrap();
-    let rng = rand::SystemRandom::new();
-    let key_pair = signature::RsaKeyPair::from_der(&pem.contents).unwrap();
-    let mut signature = vec![0; key_pair.public_modulus_len()];
-    key_pair
-        .sign(
-            &signature::RSA_PKCS1_SHA256,
-            &rng,
-            message.as_bytes(),
-            &mut signature,
-        )
-        .unwrap();
 
-    return encode(&signature);
+pub struct RSA2SIGN {
+    rng: rand::SystemRandom,
+    key_pair: signature::RsaKeyPair,
+}
+
+impl RSA2SIGN {
+    pub fn new() -> Self {
+        let pem = parse(PRIVATE_KEY).unwrap();
+        let rng = rand::SystemRandom::new();
+        let key_pair = signature::RsaKeyPair::from_der(&pem.contents).unwrap();
+
+        RSA2SIGN { rng, key_pair }
+    }
+    pub fn sign(&self, data: &[u8]) -> String {
+        let mut signature = vec![0; self.key_pair.public_modulus_len()];
+        self.key_pair
+            .sign(
+                &signature::RSA_PKCS1_SHA256,
+                &self.rng,
+                data,
+                &mut signature,
+            )
+            .unwrap();
+        encode(&signature)
+    }
+}
+
+static RSA2SIGN_INSTANCE: OnceCell<RSA2SIGN> = OnceCell::new();
+
+
+#[wasm_bindgen]
+pub fn rsa2_sign(message: &str) -> String {
+    RSA2SIGN_INSTANCE
+        .get_or_init(|| RSA2SIGN::new())
+        .sign(message.as_bytes())
 }
 
 #[cfg(test)]
